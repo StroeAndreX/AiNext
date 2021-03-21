@@ -19,17 +19,17 @@ class InitScreen extends StatefulWidget {
   //final bool fromAuth;
   final List<NavigationItem> navItems = [
     NavigationItem(
-      icon: Icons.home_outlined, //Coolicons.calendar_event_outline,
+      icon: Icons.home_outlined,
       selectedIcon: Icons.home_rounded,
       title: "Home",
     ),
     NavigationItem(
-      icon: Icons.file_copy_outlined, //Coolicons.tag_outline,
+      icon: Icons.file_copy_outlined,
       selectedIcon: Icons.file_copy_rounded,
       title: "Collections",
     ),
     NavigationItem(
-      icon: Icons.timer_outlined, //Coolicons.location_outline,
+      icon: Icons.timer_outlined,
       selectedIcon: Icons.timer_rounded,
       title: "Activities",
     ),
