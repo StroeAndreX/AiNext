@@ -27,19 +27,29 @@ dependencies:
     sdk: flutter
   audioplayer: 0.8.1
   audioplayer_web: 0.7.1
+  auto_size_text_field: ^0.1.7
+  cloud_firestore: ^1.0.2
+  crypto: ^3.0.0
   cupertino_icons: ^1.0.2
+  email_validator: ^1.0.6
+  firebase: ^9.0.1
+  firebase_analytics: ^7.1.1
+  firebase_auth: ^1.0.1
+  firebase_crashlytics: ^1.0.0
+  firebase_performance: ^0.6.0
   flutter_redux: ^0.7.0
   flutter_svg: ^0.19.3
   google_fonts: ^2.0.0
+  google_sign_in: ^5.0.1
   path_provider: ^2.0.1
   redux: ^4.0.0+3
   redux_logging: ^0.4.0
   redux_persist: ^0.8.4
   redux_thunk: ^0.3.0
   shared_preferences: ^2.0.3
-  auto_size_text_field: ^0.1.7
-  table_calendar: ^2.2.3
+  sign_in_with_apple: ^2.5.2
   sliding_up_panel: ^1.0.2
+  table_calendar: ^2.2.3
 
 dev_dependencies:
   flutter_test:

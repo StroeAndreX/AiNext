@@ -84,11 +84,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
         builder: (BuildContext context, CollectionsVM collectionsVM) {
           refreshTask(collectionsVM);
           return Stack(children: [
-            HomePageHeader(
-              weekDay: weekDay,
-              month: month,
-              day: now.day.toString(),
-            ),
             Container(
               color: Colors.transparent,
               height: SizeConfig.screenHeight -
@@ -106,6 +101,11 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   collectionType: collectionType,
                 ),
               ),
+            ),
+            HomePageHeader(
+              weekDay: weekDay,
+              month: month,
+              day: now.day.toString(),
             ),
             Column(
               children: [

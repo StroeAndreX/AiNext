@@ -91,6 +91,8 @@ class _InitScreenState extends State<InitScreen> {
     SizeConfig().init(context);
     ColorsConfig().init(context);
 
+    print(store.state.account.toMap().toString());
+
     return StoreConnector<AppState, dynamic>(
       converter: (Store<AppState> store) => null,
       builder: (BuildContext context, dynamic dyn) => Scaffold(

@@ -1,3 +1,7 @@
+import 'package:AiOrganization/Models/Account.dart';
+import 'package:AiOrganization/Redux/Store.dart';
+import 'package:AiOrganization/Screens/Authentification/Login/LoginScreen.dart';
+import 'package:AiOrganization/Screens/Authentification/RegisteAccount/RegisterScreen.dart';
 import 'package:AiOrganization/Screens/InitScreen.dart';
 import 'package:AiOrganization/Styles/CalendarLabels.dart';
 import 'package:AiOrganization/Styles/ColorsConfig.dart';
@@ -16,8 +20,11 @@ class HomePageHeader extends StatefulWidget {
 }
 
 class _HomePageHeaderState extends State<HomePageHeader> {
+  Account myAccount = new Account();
+
   @override
   Widget build(BuildContext context) {
+    myAccount = store.state.account;
     return Container(
         height: SizeConfig.getProportionateScreenHeight(265),
         child: Stack(
@@ -29,7 +36,7 @@ class _HomePageHeaderState extends State<HomePageHeader> {
                 color: ColorsConfig.primary.withOpacity(.5)),
             Padding(
                 padding: EdgeInsets.only(
-                  top: SizeConfig.getProportionateScreenHeight(60),
+                  top: SizeConfig.getProportionateScreenHeight(50),
                   left: SizeConfig.getProportionateScreenWidth(20),
                   right: SizeConfig.getProportionateScreenWidth(20),
                 ),
@@ -39,13 +46,42 @@ class _HomePageHeaderState extends State<HomePageHeader> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Icon(Icons.menu_outlined, color: Colors.white),
+                        GestureDetector(
+                          onTap: () => {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LoginScreen()),
+                            )
+                          },
+                          child: Container(
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  backgroundImage:
+                                      (myAccount.photoUrl != null &&
+                                              myAccount.photoUrl.trim() != "")
+                                          ? NetworkImage(myAccount.photoUrl)
+                                          : null,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                    (myAccount.uid == null)
+                                        ? "Login to your account"
+                                        : "Hello, ${myAccount.displayName}",
+                                    style: labelStyle)
+                              ],
+                            ),
+                          ),
+                        ),
+                        //Icon(Icons.menu_outlined, color: Colors.white),
                         Icon(Icons.lightbulb, color: Colors.white),
                       ],
                     ),
                     SizedBox(
                         height: SizeConfig.getProportionateScreenHeight(60)),
-                    Text("Goodmorning Andre,", style: titleStyle),
+                    Text("Goodmorning,", style: titleStyle),
                     Text(
                         "Today is ${widget.weekDay}, ${widget.month} ${widget.day}",
                         style: subTitleStyle),

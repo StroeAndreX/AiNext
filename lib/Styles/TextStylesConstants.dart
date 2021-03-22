@@ -39,7 +39,25 @@ TextStyle titlePanelStyle = GoogleFonts.poppins(
     color: Colors.black,
     fontWeight: FontWeight.w500,
     textStyle: TextStyle(fontSize: SizeConfig.getProportionateScreenWidth(28)));
+TextStyle subtitlePanelStyle = GoogleFonts.poppins(
+    color: Colors.black,
+    fontWeight: FontWeight.w300,
+    textStyle: TextStyle(fontSize: SizeConfig.getProportionateScreenWidth(24)));
 TextStyle actionButtonStyle = GoogleFonts.poppins(
     color: ColorsConfig.primary,
     fontWeight: FontWeight.w500,
     textStyle: TextStyle(fontSize: SizeConfig.getProportionateScreenWidth(16)));
+
+TextStyle defaultStyle = GoogleFonts.poppins(
+    color: Colors.black,
+    fontWeight: FontWeight.w500,
+    textStyle: TextStyle(fontSize: SizeConfig.getProportionateScreenWidth(18)));
+TextStyle boldStyle = GoogleFonts.poppins(
+    color: Colors.black,
+    fontWeight: FontWeight.w700,
+    textStyle: TextStyle(fontSize: SizeConfig.getProportionateScreenWidth(18)));
+TextStyle textButtonStyle = GoogleFonts.poppins(
+    color: ColorsConfig.primary,
+    fontWeight: FontWeight.w700,
+    decoration: TextDecoration.underline,
+    textStyle: TextStyle(fontSize: SizeConfig.getProportionateScreenWidth(12)));

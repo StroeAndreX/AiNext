@@ -11,10 +11,24 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:redux/redux.dart';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_core/firebase_core.dart';
+
 import 'Redux/Store.dart';
 
-void main() {
+FirebaseAnalytics analytics;
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  // Analytics
+  analytics = FirebaseAnalytics();
+  FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+
   runApp(MyApp());
 }
 
@@ -29,6 +43,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  /// Firebase Init
+  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+
   bool isThemeDark = false;
   // Dynamic languages
   Locale _locale;
@@ -51,48 +68,66 @@ class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return StoreProvider<AppState>(
-      store: store,
-      child: MaterialApp(
-        locale: _locale,
-        supportedLocales: [
-          Locale('it', 'IT'),
-          Locale('en', 'EN'),
-        ],
-        localizationsDelegates: [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        localeResolutionCallback:
-            (Locale locale, Iterable<Locale> supportedLocales) {
-          if (locale == null) {
-            debugPrint("*language locale is null!!!");
-            return supportedLocales.last;
+    return FutureBuilder(
+        future: _initialization,
+        builder: (context, snapshot) {
+          // Check for errors
+          if (snapshot.hasError) {
+            print("is Error");
+            return Scaffold();
           }
+          if (snapshot.connectionState == ConnectionState.done) {
+            return StoreProvider<AppState>(
+              store: store,
+              child: MaterialApp(
+                locale: _locale,
+                debugShowCheckedModeBanner: false,
+                supportedLocales: [
+                  Locale('it', 'IT'),
+                  Locale('en', 'EN'),
+                ],
+                localizationsDelegates: [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                localeResolutionCallback:
+                    (Locale locale, Iterable<Locale> supportedLocales) {
+                  if (locale == null) {
+                    debugPrint("*language locale is null!!!");
+                    return supportedLocales.last;
+                  }
 
-          for (Locale supportedLocale in supportedLocales) {
-            if (supportedLocale.languageCode == locale.languageCode ||
-                supportedLocale.countryCode == locale.countryCode) {
-              return supportedLocale;
-            }
+                  for (Locale supportedLocale in supportedLocales) {
+                    if (supportedLocale.languageCode == locale.languageCode ||
+                        supportedLocale.countryCode == locale.countryCode) {
+                      return supportedLocale;
+                    }
+                  }
+
+                  return supportedLocales.first;
+                },
+                navigatorObservers: [
+                  FirebaseAnalyticsObserver(analytics: analytics)
+                ],
+                theme: ThemeData(dividerColor: Colors.transparent),
+                home: StoreBuilder<AppState>(
+                  onInit: (store) async {
+                    await store.dispatch(GetItemsAction());
+                  },
+                  builder: (BuildContext context, Store<AppState> store) {
+                    return InitScreen();
+                  },
+                ),
+              ),
+            );
           }
-
-          return supportedLocales.first;
-        },
-        theme: ThemeData(dividerColor: Colors.transparent),
-        home: StoreBuilder<AppState>(
-          onInit: (store) async {
-            await store.dispatch(GetItemsAction());
-          },
-          builder: (BuildContext context, Store<AppState> store) {
-            return InitScreen();
-          },
-        ),
-      ),
-    );
+          return MaterialApp(
+              home:
+                  Scaffold(body: Center(child: Text("Waiting for firebase"))));
+        });
   }
 }

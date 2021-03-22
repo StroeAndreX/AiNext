@@ -6,16 +6,28 @@ import 'package:AiOrganization/Models/AppState.dart';
 import 'package:AiOrganization/Models/Collection.dart';
 import 'package:AiOrganization/Models/SubActivity.dart';
 import 'package:AiOrganization/Models/Task.dart';
+import 'package:AiOrganization/Redux/Actions/AccountActions.dart';
 import 'package:AiOrganization/Redux/Actions/ActivitiesActions.dart';
 import 'package:AiOrganization/Redux/Actions/CollectionActions.dart';
+import 'package:AiOrganization/Redux/Middleware/AccountMiddleware.dart';
+import 'package:AiOrganization/Redux/Middleware/CoreSystemMiddleware.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:redux/redux.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 List<Middleware<AppState>> appStateMiddleware([
   AppState state = const AppState(activities: []),
 ]) {
-  final loadItems = _loadFromPrefs(state);
-  final saveItems = _saveToPrefs(state);
+  CoreSystemMiddleware _coreSystemMiddleware = new CoreSystemMiddleware();
+  AccountMiddleware _accountMiddleware = new AccountMiddleware();
+
+  final loadItems = _coreSystemMiddleware.loadSystem(state);
+  final saveItems = _coreSystemMiddleware.saveSystem(state);
+
+  final createAccount = _accountMiddleware.createAccount(state);
+  final signInWithGoogle = _accountMiddleware.signInWithGoogle(state);
+  final signInWithEmail = _accountMiddleware.signInWithEmail(state);
+  final signOutAccount = _accountMiddleware.signOutAccount(state);
 
   return [
     TypedMiddleware<AppState, NewActivityAction>(saveItems),
@@ -33,77 +45,16 @@ List<Middleware<AppState>> appStateMiddleware([
     TypedMiddleware<AppState, RemoveTaskAction>(saveItems),
     TypedMiddleware<AppState, SetCompleteTaskAction>(saveItems),
     TypedMiddleware<AppState, UnSetCompleteTaskAction>(saveItems),
+    TypedMiddleware<AppState, UnSetCompleteTaskAction>(saveItems),
+    TypedMiddleware<AppState, UnSetCompleteTaskAction>(saveItems),
+
+    //// [Account Middlewares]
+    TypedMiddleware<AppState, CreateAccountAction>(createAccount),
+    TypedMiddleware<AppState, SignInWithGoogleAction>(signInWithGoogle),
+    TypedMiddleware<AppState, SignInWithEmailAction>(signInWithEmail),
+    TypedMiddleware<AppState, SignOutAction>(signOutAccount),
+
+    //// [Load from Prefs or Cloud - Middlewares]
     TypedMiddleware<AppState, GetItemsAction>(loadItems),
   ];
-}
-
-Middleware<AppState> _loadFromPrefs(AppState state) {
-  return (Store<AppState> store, action, NextDispatcher next) async {
-    next(action);
-
-    await loadFromPrefs().then((state) =>
-        store.dispatch(LoadedItemsAction(state.activities, state.collections)));
-  };
-}
-
-Middleware<AppState> _saveToPrefs(AppState state) {
-  return (Store<AppState> store, action, NextDispatcher next) {
-    next(action);
-
-    saveToPrefs(store.state);
-  };
-}
-
-void saveToPrefs(AppState state) async {
-  SharedPreferences preferences = await SharedPreferences.getInstance();
-  List<Activity> activities = state.activities;
-  List<Collection> collections = state.collections;
-
-  var activitiesJSON = jsonEncode(activities.map((e) => e.toMap()).toList());
-  var collectionsJSON = jsonEncode(collections.map((e) => e.toMap()).toList());
-
-  print("ActivitiesJSON: " + activitiesJSON);
-  print("CollectionsJSON: " + collectionsJSON);
-
-  //var string = json.encode(activitiesMap);
-  await preferences.setString('activitiesState', activitiesJSON);
-  await preferences.setString('collectionsState', collectionsJSON);
-}
-
-Future<AppState> loadFromPrefs() async {
-  SharedPreferences preferences = await SharedPreferences.getInstance();
-  var activitiesString = preferences.getString('activitiesState');
-  var collectionsString = preferences.getString('collectionsState');
-
-  if (activitiesString != null || collectionsString != null) {
-    List<dynamic> activitiesJSON = jsonDecode(activitiesString);
-    List<dynamic> collectionsJSON = jsonDecode(collectionsString);
-
-    //Activities Data
-    List<Activity> activities = (activitiesJSON).map((i) {
-      List<dynamic> dynamicSubActivities = jsonDecode(i['subActivities']);
-      List<SubActivity> subActivities =
-          (dynamicSubActivities).map((i) => SubActivity.fromMap(i)).toList();
-
-      return Activity.fromMap(i, subActivities);
-    }).toList();
-
-    /// Collections Data
-    List<Collection> collections = (collectionsJSON).map((i) {
-      List<dynamic> dynamicTask = jsonDecode(i['tasks']);
-      List<Task> collectionTask =
-          (dynamicTask).map((i) => Task.fromMap(i)).toList();
-
-      return Collection.fromMap(i, collectionTask);
-    }).toList();
-
-    print("ActivitiesJSON: " + activitiesJSON.toString());
-    print("CollectionsJSON: " + collectionsJSON.toString());
-
-    //print("ActivitiesMiddleware: " + activities.toString());
-
-    return AppState(
-        activities: activities ?? [], collections: collections ?? []);
-  }
-  return AppState.initialState();
 }
