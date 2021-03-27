@@ -1,4 +1,4 @@
-# activity_tracker
+# AiOrganization
 
 A new Flutter project.
 
