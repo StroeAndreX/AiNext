@@ -13,6 +13,9 @@ class Account {
   final int collectionCount;
   final int activitiesCount;
 
+  final List<String> collectionsIDs;
+  final List<String> activitiesIDs;
+
   Account({
     this.uid,
     this.email,
@@ -22,15 +25,22 @@ class Account {
     this.isPremium = false,
     this.activitiesCount = 0,
     this.collectionCount = 0,
+    this.collectionsIDs,
+    this.activitiesIDs,
   });
 
-  Account copyWith(
-      {String uid,
-      String email,
-      String password,
-      String displayName,
-      String photoUrl,
-      bool isPremium}) {
+  Account copyWith({
+    String uid,
+    String email,
+    String password,
+    String displayName,
+    String photoUrl,
+    bool isPremium,
+    int activitiesCount,
+    int collectionCount,
+    List<String> collectionsIDs,
+    List<String> activitiesIDs,
+  }) {
     return Account(
       uid: uid ?? this.uid,
       email: email ?? this.email,
@@ -40,6 +50,8 @@ class Account {
       isPremium: isPremium ?? this.isPremium,
       collectionCount: collectionCount ?? this.collectionCount,
       activitiesCount: activitiesCount ?? this.activitiesCount,
+      collectionsIDs: collectionsIDs ?? this.collectionsIDs,
+      activitiesIDs: activitiesIDs ?? this.activitiesIDs,
     );
   }
 
@@ -51,17 +63,30 @@ class Account {
         photoUrl = account['photoURL'],
         isPremium = account['isPremium'] ?? false,
         collectionCount = account['collectionCount'] ?? 0,
-        activitiesCount = account['activitiesCount'] ?? 0;
+        activitiesCount = account['activitiesCount'] ?? 0,
+        activitiesIDs = account['activitiesIDs'] ?? [],
+        collectionsIDs = account['collectionsIDs'] ?? [];
 
   Map<String, dynamic> toMap() => {
         "uid": this.uid,
         "email": this.email,
         "password": this.password,
-        "displaydisplayName": this.displayName,
+        "displayName": this.displayName,
         "isPremium": this.isPremium,
         "photoURL": this.photoUrl,
         "collectionCount": this.collectionCount,
-        "activitiesCount": this.activitiesCount
+        "activitiesCount": this.activitiesCount,
+      };
+
+  Map<String, dynamic> toMapFirestore() => {
+        "isPremium": this.isPremium,
+        "collectionCount": this.collectionCount,
+        "activitiesCount": this.activitiesCount,
+      };
+
+  Map<String, dynamic> toMapFirestoreSubDocument() => {
+        "activitiesIDs": this.activitiesIDs,
+        "collectionsIDs": this.collectionsIDs,
       };
 
   @override

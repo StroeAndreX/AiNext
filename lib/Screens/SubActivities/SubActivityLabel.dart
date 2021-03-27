@@ -1,3 +1,4 @@
+import 'package:AiOrganization/Core/Search.dart';
 import 'package:AiOrganization/Models/Activity.dart';
 import 'package:AiOrganization/Redux/Actions/ActivitiesActions.dart';
 import 'package:AiOrganization/Redux/Store.dart';
@@ -20,7 +21,10 @@ class _SubActivitiesLabelState extends State<SubActivitiesLabel> {
 
   @override
   Widget build(BuildContext context) {
-    _controller.text = widget.activity.title;
+    setState(() {
+      _controller.text = store
+          .state.activities[Search.returnActivityIndex(widget.activity)].title;
+    });
 
     return Container(
       margin: EdgeInsets.only(
@@ -38,12 +42,6 @@ class _SubActivitiesLabelState extends State<SubActivitiesLabel> {
                 store.dispatch(CustomizeActivityAction(widget.activity,
                     newActivityName: value));
               }
-            },
-            onChanged: (String e) {
-              setState(() {
-                numLines = '\n'.allMatches(e).length + 1;
-                print(numLines);
-              });
             },
             style:
                 GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.w500),

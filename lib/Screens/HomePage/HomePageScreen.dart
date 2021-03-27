@@ -1,3 +1,5 @@
+import 'package:AiOrganization/Core/Firebase/CollectionsDB.dart';
+import 'package:AiOrganization/Core/Firebase/CollectionsListeners/CollectionsDBListeners.dart';
 import 'package:AiOrganization/Models/AppState.dart';
 import 'package:AiOrganization/Models/Collection.dart';
 import 'package:AiOrganization/Models/Task.dart';
@@ -58,6 +60,9 @@ class _HomePageScreenState extends State<HomePageScreen> {
     collectionName = now.millisecondsSinceEpoch
         .toString(); //now.day.toString() + month.toString();
 
+    if (store.state.account.isPremium)
+      CollectionsDBListeners().listenToCollectionCalendarTasks(collectionName);
+
     /// Retrive tasks if the collection is now empty
     if (_todayCollection() != -1) {
       todayTasks = store.state.collections[_todayCollection()].tasks;
@@ -68,6 +73,12 @@ class _HomePageScreenState extends State<HomePageScreen> {
     if (_todayCollection() != -1) {
       todayTasks = collectionsVM.collections[_todayCollection()].tasks;
     }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
   }
 
   /// [BUILDER]
@@ -142,13 +153,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 ),
               ],
             ),
-            // Container(
-            //   height: SizeConfig.screenHeight,
-            //   color: Colors.red,
-            //   child: SlidingUpPanel(
-            //       panel: Container(),
-            //       body: Container(child: Center(child: Text("Hello world")))),
-            // )
           ]);
         });
   }

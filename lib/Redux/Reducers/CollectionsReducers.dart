@@ -1,3 +1,4 @@
+import 'package:AiOrganization/Core/Firebase/CollectionsDB.dart';
 import 'package:AiOrganization/Core/Search.dart';
 import 'package:AiOrganization/Models/Collection.dart';
 import 'package:AiOrganization/Models/Task.dart';
@@ -5,6 +6,7 @@ import 'package:AiOrganization/Redux/Actions/ActivitiesActions.dart';
 import 'package:AiOrganization/Redux/Actions/CollectionActions.dart';
 import 'package:AiOrganization/Redux/Actions/TaskActions.dart';
 import 'package:AiOrganization/Redux/Reducers/TaskReducers.dart';
+import 'package:AiOrganization/Redux/Store.dart';
 import 'package:AiOrganization/Styles/ColorsConfig.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
@@ -42,6 +44,14 @@ Reducer<List<Collection>> collectionsReducers =
   TypedReducer<List<Collection>, CustomizeTaskNotesAction>(
       customizeTaskNotesReducer),
   TypedReducer<List<Collection>, LoadedItemsAction>(loadItemsReducer),
+
+  /// [Firebase implementation]
+  TypedReducer<List<Collection>, SetCollectionUID>(setCollectionUID),
+  TypedReducer<List<Collection>, InsertNewCollection>(insertNewCollection),
+  TypedReducer<List<Collection>, ModifyCollection>(modifyCollectionReducer),
+  TypedReducer<List<Collection>, NewTaskState>(newTaskState),
+  TypedReducer<List<Collection>, InsertNewTask>(insertNewTaskReducer),
+  TypedReducer<List<Collection>, RemoveLocalTaskAction>(removeLocalTaskReducer),
 ]);
 
 /// [Create a new Collection With InitTask and add into the store]
@@ -51,16 +61,22 @@ List<Collection> newCollectionReducer(
   /// Action @par - The CollectionType
   /// Action @par - The task
 
+  /// Create the new collection
+  Collection newCollection = Collection(
+      id: Search.returnNewCollectionID(),
+      title: action.collectionName,
+      tasks: []..add(action.task),
+      iconData: Icons.calendar_today_outlined,
+      collectionType: action.collectionType ?? CollectionType.CREATED,
+      color: Colors.orange);
+
+  /// [Firestore] Register the new collection on server
+  CollectionsDB().createNewCollection(newCollection);
+
   /// Create new Collection and add the first @Task
   return []
     ..addAll(collections)
-    ..add(Collection(
-        id: Search.returnNewCollectionID(),
-        title: action.collectionName,
-        tasks: []..add(action.task),
-        iconData: Icons.calendar_today_outlined,
-        collectionType: action.collectionType ?? CollectionType.CREATED,
-        color: Colors.orange));
+    ..add(newCollection);
 }
 
 /// [Create a new Empty Collection and add into the store]
@@ -68,16 +84,22 @@ List<Collection> newEmptyCollectionReducer(
     List<Collection> collections, NewEmptyCollectionAction action) {
   /// Action @par - The New Collection name
 
-  /// Create the collection
+  /// Create the new collection
+  Collection newCollection = Collection(
+      id: Search.returnNewCollectionID(),
+      title: action.collectionName,
+      tasks: [],
+      iconData: Icons.menu_open,
+      collectionType: CollectionType.CREATED,
+      color: ColorsConfig.primary);
+
+  /// [Firestore] Register the new collection on server
+  CollectionsDB().createNewCollection(newCollection);
+
+  /// Add the created collection into the list
   return []
     ..addAll(collections)
-    ..add(Collection(
-        id: Search.returnNewCollectionID(),
-        title: action.collectionName,
-        tasks: [],
-        iconData: Icons.menu_open,
-        collectionType: CollectionType.CREATED,
-        color: ColorsConfig.primary));
+    ..add(newCollection);
 }
 
 /// [Add a new Task into the Collection]
@@ -95,6 +117,10 @@ List<Collection> addTaskToCollectionReducer(
   // alter the collections in the store and then return them
   collections[Search.returnCollectionIndex(altCollection)] = altCollection;
 
+  /// [Firestore] Register this new task on server
+  if (store.state.account.isPremium)
+    CollectionsDB().addNewTask(altCollection, action.task);
+
   /// Save into the store
   return collections;
 }
@@ -104,8 +130,16 @@ List<Collection> removeCollectionReducer(
     List<Collection> collections, RemoveCollectionAction action) {
   /// Action @par - The Collection
 
+  /// Firebase issue: Need to find the colleciton by id
+  Collection collectionToRemove = collections
+      .firstWhere((collection) => collection.id == action.collection.id);
+
   // Remove collection from list
-  collections.remove(action.collection);
+  collections.remove(collectionToRemove);
+
+  /// [Firestore]
+  if (store.state.account.isPremium)
+    CollectionsDB().removeCollection(action.collection);
 
   return collections;
 }
@@ -131,6 +165,38 @@ List<Collection> removeTaskReducer(
   // Insert the altCollection to collections List
   collections[Search.returnCollectionIndex(altCollection)] = altCollection;
 
+  /// [Firestore]
+  if (store.state.account.isPremium)
+    CollectionsDB().removeTask(altCollection, action.task);
+
+  /// Save into the store
+  return collections;
+}
+
+/// [Remove a Task from the list --- ONLY LOCAL]
+List<Collection> removeLocalTaskReducer(
+    List<Collection> collections, RemoveLocalTaskAction action) {
+  /// Action @par - The Collection
+  /// Action @par - The Task ---> Need to be deleted
+
+  // Call the parameter Collection into a new variable to alter
+  Collection altCollection = action.collection;
+
+  // Call the list of Tasks from the given Collection
+  List<Task> tasks = altCollection.tasks;
+
+  /// Firebase issue:
+  Task removeTask = tasks.firstWhere((element) => element.id == action.task.id);
+
+  /// Remove the given task from the list
+  tasks.removeWhere((task) => task == removeTask);
+
+  /// Save the new state of the list of tasks into the Collection Object
+  altCollection = altCollection.copyWith(tasks: tasks);
+
+  // Insert the altCollection to collections List
+  collections[Search.returnCollectionIndex(altCollection)] = altCollection;
+
   /// Save into the store
   return collections;
 }
@@ -138,7 +204,7 @@ List<Collection> removeTaskReducer(
 /// [Customize the CollectionName]
 List<Collection> customiozeCollectionNameReducer(
     List<Collection> collections, CustomizeCollectionNameAction action) {
-  /// Action @par - The Collection
+  /// Action @par - The Collections
   /// Action @par - The new Collection name
 
   /// Call the  parameter Collection into a new variabile to alterate
@@ -147,6 +213,10 @@ List<Collection> customiozeCollectionNameReducer(
   /// Alter the collection object
   altCollection = altCollection.copyWith(title: action.newCollectionName);
   collections[Search.returnCollectionIndex(altCollection)] = altCollection;
+
+  /// [Firestore]
+  if (store.state.account.isPremium)
+    CollectionsDB().modfiyCollection(altCollection);
 
   /// Save into the store
   return collections;
@@ -165,6 +235,10 @@ List<Collection> customiozeCollectionColorReducer(
   altCollection = altCollection.copyWith(color: action.color);
   collections[Search.returnCollectionIndex(altCollection)] = altCollection;
 
+  /// [Firestore]
+  if (store.state.account.isPremium)
+    CollectionsDB().modfiyCollection(altCollection);
+
   /// Save into the store
   return collections;
 }
@@ -181,6 +255,10 @@ List<Collection> customiozeCollectionIconReducer(
   /// Alter the collection object
   altCollection = altCollection.copyWith(iconData: action.icon);
   collections[Search.returnCollectionIndex(altCollection)] = altCollection;
+
+  /// [Firestore]
+  if (store.state.account.isPremium)
+    CollectionsDB().modfiyCollection(altCollection);
 
   /// Save into the store
   return collections;
@@ -209,6 +287,10 @@ List<Collection> setCompleteTaskReducer(
   Collection alterCollection = altCollection.copyWith(tasks: tasks);
   collections[Search.returnCollectionIndex(altCollection)] = alterCollection;
 
+  /// [Firestore]
+  if (store.state.account.isPremium)
+    CollectionsDB().modfiyTasks(altCollection, altTask);
+
   /// Save into the store
   return collections;
 }
@@ -236,6 +318,10 @@ List<Collection> unsetCompleteTaskReducer(
   Collection alterCollection = altCollection.copyWith(tasks: tasks);
   collections[Search.returnCollectionIndex(altCollection)] = alterCollection;
 
+  /// [Firestore]
+  if (store.state.account.isPremium)
+    CollectionsDB().modfiyTasks(altCollection, altTask);
+
   /// Save into the store
   return collections;
 }
@@ -244,4 +330,58 @@ List<Collection> unsetCompleteTaskReducer(
 List<Collection> loadItemsReducer(
     List<Collection> collections, LoadedItemsAction action) {
   return action.collections;
+}
+
+/// [Set the Document UID of the collection --> Firebase implementation]
+List<Collection> setCollectionUID(
+    List<Collection> collections, SetCollectionUID action) {
+  /// Action @par - The Collection
+  /// Action @par - The uid
+
+  print("This reducer should fawking work: " + action.uid);
+
+  /// Call the  parameter Collection into a new variabile to alterate
+  Collection altCollection = action.collection;
+
+  /// Alter the collection object
+  altCollection = altCollection.copyWith(uid: action.uid);
+  collections[Search.returnCollectionIndex(altCollection)] = altCollection;
+
+  /// Save into the store
+  return collections;
+}
+
+/// [Firebase integration -- Other utilities]
+List<Collection> insertNewCollection(
+    List<Collection> collections, InsertNewCollection action) {
+  Collection collection = action.collection;
+
+  /// Add the created collection into the list
+  return []
+    ..addAll(collections)
+    ..add(collection);
+}
+
+List<Collection> modifyCollectionReducer(
+    List<Collection> collections, ModifyCollection action) {
+  // Call the parameter Collection into a new variable to alter
+  Collection altCollection = action.collection;
+
+  // Insert the altCollection to collections List
+  collections[Search.returnCollectionIndex(altCollection)] = altCollection;
+
+  return collections;
+}
+
+List<Collection> newTaskState(
+    List<Collection> collections, NewTaskState action) {
+  Task newTaskState = action.task;
+  Collection altCollection = action.collection;
+
+  altCollection.tasks[Search.returnTaskIndex(altCollection, newTaskState)] =
+      newTaskState;
+
+  collections[Search.returnCollectionIndex(altCollection)] = altCollection;
+
+  return collections;
 }

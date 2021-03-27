@@ -215,11 +215,12 @@ class _SubActivityTabWidgetState extends State<SubActivityTabWidget> {
                       ActivitiesVM.create(store),
                   builder: (BuildContext context, ActivitiesVM activitiesVM) {
                     /// Reload the Activity object and the SubActivity object so it's 100% Updated irl
-                    loadedActivity = store.state.activities[
+                    loadedActivity = activitiesVM.activities[
                         Search.returnActivityIndex(widget.activity)];
+
                     loadedSubActivity = loadedActivity.subActivities[
                         Search.returnSubActivityIndex(
-                            widget.activity, widget.subActivity)];
+                            loadedActivity, widget.subActivity)];
 
                     /// Based on @onRunning parameter put the watch onStart or onStop!
                     if (loadedSubActivity.isRunning && !_watch.isRunning)

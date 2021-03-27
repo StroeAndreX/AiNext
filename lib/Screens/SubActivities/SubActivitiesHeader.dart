@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:AiOrganization/Core/Firebase/ActivitiesListeners/ActivitiesDBListeners.dart';
 import 'package:AiOrganization/Core/Search.dart';
 import 'package:AiOrganization/Models/Activity.dart';
 import 'package:AiOrganization/Models/AppState.dart';
@@ -36,6 +37,9 @@ class _SubActivitiesHeaderState extends State<SubActivitiesHeader> {
   void initState() {
     loadedActivity =
         store.state.activities[Search.returnActivityIndex(widget.activity)];
+
+    if (store.state.account.isPremium)
+      ActivitiesDBListeners().listenToSubActivtiesActivity(loadedActivity);
 
     calculateActivityTotalDuration();
     // TODO: implement initState

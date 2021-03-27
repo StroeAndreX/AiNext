@@ -1,8 +1,10 @@
+import 'package:AiOrganization/Core/Firebase/CollectionsDB.dart';
 import 'package:AiOrganization/Core/Search.dart';
 import 'package:AiOrganization/Models/Collection.dart';
 import 'package:AiOrganization/Models/Task.dart';
 import 'package:AiOrganization/Redux/Actions/CollectionActions.dart';
 import 'package:AiOrganization/Redux/Actions/TaskActions.dart';
+import 'package:AiOrganization/Redux/Store.dart';
 
 /// [Customize the DateTime of the Task]
 List<Collection> customizeTaskDateTimeReducer(
@@ -26,6 +28,10 @@ List<Collection> customizeTaskDateTimeReducer(
 
   altCollection = altCollection.copyWith(tasks: altTasks);
   collections[Search.returnCollectionIndex(altCollection)] = altCollection;
+
+  /// [Firestore]
+  if (store.state.account.isPremium)
+    CollectionsDB().modfiyTasks(altCollection, altTask);
 
   /// Save into the store
   return collections;
@@ -55,6 +61,10 @@ List<Collection> customizeTaskLabelReducer(
 
   altCollection = altCollection.copyWith(tasks: altTasks);
   collections[Search.returnCollectionIndex(altCollection)] = altCollection;
+
+  /// [Firestore]
+  if (store.state.account.isPremium)
+    CollectionsDB().modfiyTasks(altCollection, altTask);
 
   /// Save into the store
   return collections;
@@ -86,6 +96,10 @@ List<Collection> customizeTaskNotesReducer(
   altCollection = altCollection.copyWith(tasks: altTasks);
   collections[Search.returnCollectionIndex(altCollection)] = altCollection;
 
+  /// [Firestore]
+  if (store.state.account.isPremium)
+    CollectionsDB().modfiyTasks(altCollection, altTask);
+
   /// Save into the store
   return collections;
 }
@@ -115,6 +129,22 @@ List<Collection> customizeTaskNameReducer(
   altCollection = altCollection.copyWith(tasks: altTasks);
   collections[Search.returnCollectionIndex(altCollection)] = altCollection;
 
+  /// [Firestore]
+  if (store.state.account.isPremium)
+    CollectionsDB().modfiyTasks(altCollection, altTask);
+
   /// Save into the store
+  return collections;
+}
+
+List<Collection> insertNewTaskReducer(
+    List<Collection> collections, InsertNewTask action) {
+  Task newTaskState = action.task;
+  Collection altCollection = action.collection;
+
+  altCollection.tasks.add(action.task);
+
+  collections[Search.returnCollectionIndex(altCollection)] = altCollection;
+
   return collections;
 }

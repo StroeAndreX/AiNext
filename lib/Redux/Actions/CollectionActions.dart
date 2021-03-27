@@ -53,6 +53,13 @@ class RemoveTaskAction {
   RemoveTaskAction(this.collection, this.task);
 }
 
+class RemoveLocalTaskAction {
+  final Collection collection;
+  final Task task;
+
+  RemoveLocalTaskAction(this.collection, this.task);
+}
+
 class AddNewTaskToCollection {
   Collection collection;
   Task task;
@@ -81,4 +88,25 @@ class LoadedItemsAction {
   final List<Collection> collections;
 
   LoadedItemsAction(this.activities, this.collections);
+}
+
+class SetCollectionUID {
+  final Collection collection;
+  final String uid;
+
+  SetCollectionUID(this.collection, this.uid);
+}
+
+/// [Firebase implementation and utilities]
+
+class InsertNewCollection {
+  final Collection collection;
+
+  InsertNewCollection(this.collection);
+}
+
+class ModifyCollection {
+  final Collection collection;
+
+  ModifyCollection(this.collection);
 }

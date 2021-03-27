@@ -60,7 +60,8 @@ class _InitScreenState extends State<InitScreen> {
         return SingleChildScrollView(child: ActivitiesScreen());
         break;
       case 3:
-        return CalendarScreen(); //MyHomePage(title: "Liz");
+        return MyHomePage(
+            title: "Liz"); //CalendarScreen(); //MyHomePage(title: "Liz");
         break;
 
       default:

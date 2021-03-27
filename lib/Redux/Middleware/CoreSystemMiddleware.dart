@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:AiOrganization/Core/Firebase/AccountDB.dart';
 import 'package:AiOrganization/Models/Account.dart';
 import 'package:AiOrganization/Models/Activity.dart';
 import 'package:AiOrganization/Models/AppState.dart';
@@ -8,6 +9,7 @@ import 'package:AiOrganization/Models/SubActivity.dart';
 import 'package:AiOrganization/Models/Task.dart';
 import 'package:AiOrganization/Redux/Actions/AccountActions.dart';
 import 'package:AiOrganization/Redux/Actions/CollectionActions.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:redux/redux.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,8 +20,12 @@ class CoreSystemMiddleware {
       next(action);
 
       FirebaseAuth.instance.authStateChanges().listen((User user) async {
+        // await loadFromPrefs().then((state) => store
+        //     .dispatch(LoadedItemsAction(state.activities, state.collections)));
+
         if (user == null) {
-          // If the user is going to be null then the application will be redirected in a "NoProfile Zone"
+          await loadFromPrefs().then((state) => store.dispatch(
+              LoadedItemsAction(state.activities, state.collections)));
         } else {
           Account newAccountState = store.state.account.copyWith(
               email: user.email,
@@ -27,13 +33,32 @@ class CoreSystemMiddleware {
               uid: user.uid,
               photoUrl: user.photoURL);
 
+          /// Get the account information from the store if the document exists
+          DocumentSnapshot _documentSnapshot =
+              await AccountDB().queryTheUserAccount(newAccountState);
+
+          print("DocumentSnapshot $_documentSnapshot");
+
+          /// Here is the check for existance
+          if (_documentSnapshot.exists) {
+            /// Get the data from the documentSnapshot
+            Map<String, dynamic> accountData = _documentSnapshot.data();
+
+            /// Change AccountState
+            newAccountState = newAccountState.copyWith(
+                isPremium: accountData['isPremium'],
+                activitiesCount: accountData['activitiesCount'],
+                collectionCount: accountData['collectionCount']);
+          }
+
+          if (!newAccountState.isPremium) {
+            await loadFromPrefs().then((state) => store.dispatch(
+                LoadedItemsAction(state.activities, state.collections)));
+          }
+
           store.dispatch(UpdateAccountState(newAccountState));
         }
-        //if (user != null) store.dispatch(GetAccountType(uid: user.uid));
       });
-
-      await loadFromPrefs().then((state) => store
-          .dispatch(LoadedItemsAction(state.activities, state.collections)));
     };
   }
 

@@ -1,9 +1,9 @@
 import 'package:AiOrganization/VoiceAssistant/TextToSpeechAPI.dart';
 import 'package:AiOrganization/VoiceAssistant/Voice.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:audioplayer/audioplayer.dart';
+import 'package:audioplayers/audioplayers.dart';
+//import 'package:audioplayer/audioplayer.dart';
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
 

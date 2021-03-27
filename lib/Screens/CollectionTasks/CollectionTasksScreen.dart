@@ -1,7 +1,11 @@
+import 'package:AiOrganization/Core/Firebase/CollectionsDB.dart';
+import 'package:AiOrganization/Core/Firebase/CollectionsListeners/CollectionsDBListeners.dart';
+import 'package:AiOrganization/Core/Search.dart';
 import 'package:AiOrganization/Models/AppState.dart';
 import 'package:AiOrganization/Models/Collection.dart';
 import 'package:AiOrganization/Models/Label.dart';
 import 'package:AiOrganization/Models/Task.dart';
+import 'package:AiOrganization/Redux/Store.dart';
 import 'package:AiOrganization/Redux/ViewModels/CollectionsVM.dart';
 import 'package:AiOrganization/Screens/CollectionTasks/CollectionTasksBody.dart';
 import 'package:AiOrganization/Screens/CollectionTasks/CollectionTasksHeader.dart';
@@ -43,6 +47,9 @@ class _CollectionTasksScreenState extends State<CollectionTasksScreen> {
   @override
   void initState() {
     collection = widget.collection;
+
+    if (store.state.account.isPremium)
+      CollectionsDBListeners().listenToCollectionTasks(widget.collection);
 
     // TODO: implement initState
     super.initState();
@@ -100,7 +107,9 @@ class _CollectionTasksScreenState extends State<CollectionTasksScreen> {
     });
   }
 
+  ///
   /// [Open The panel]
+  ///
   Task loadTask;
   void openThePanel(Task task) async {
     panelSize = SizeConfig.getProportionateScreenHeight(600);
@@ -129,6 +138,29 @@ class _CollectionTasksScreenState extends State<CollectionTasksScreen> {
     setState(() {
       loadTask = null;
     });
+  }
+
+  ///
+  /// [Firestore implementation management] --> TODO: Ultra Optimization using In-App checking and avoiding useless writings or readings || Phase 6 of AiOrganziation [The Ultra optimization]
+  ///
+
+  List<Task> recentlyAdded = [];
+  List<Task> recentlyModified = [];
+
+  // @Not Used for now --> Optimization fase TODO: Optimize
+  void insertRecentlyAdded(Task task) {
+    recentlyAdded.add(task);
+  }
+
+  // @Not Used for now --> Optimization fase TODO: Optimize
+  void insertRecentlyModified(Task task) {
+    bool _isInRecentlyAdded = false;
+
+    recentlyAdded.forEach((taskInList) {
+      if (taskInList.id == task.id) _isInRecentlyAdded = true;
+    });
+
+    if (!_isInRecentlyAdded) recentlyAdded.add(task);
   }
 
   @override
@@ -180,8 +212,7 @@ class _CollectionTasksScreenState extends State<CollectionTasksScreen> {
               },
               child: Column(children: [
                 CollectionTasksHeader(
-                  panelController: _panel,
-                ),
+                    panelController: _panel, collection: widget.collection),
                 //CollectionTasksBody(),
                 StoreConnector<AppState, CollectionsVM>(
                   converter: (Store<AppState> store) =>
@@ -243,10 +274,21 @@ class _CollectionTasksScreenState extends State<CollectionTasksScreen> {
                         bottom: SizeConfig.getProportionateScreenHeight(40)),
                     child: Align(
                         alignment: Alignment.bottomCenter,
-                        child: NewTaskWidget(
-                          collection: collection,
-                          collectionName: collection.title, //"CollectionName",
-                        )),
+                        child: StoreConnector<AppState, CollectionsVM>(
+                            converter: (Store<AppState> store) =>
+                                CollectionsVM.create(store),
+                            builder: (BuildContext context,
+                                CollectionsVM collectionsVM) {
+                              Collection loadedCollection =
+                                  collectionsVM.collections[
+                                      Search.returnCollectionIndex(collection)];
+
+                              return NewTaskWidget(
+                                collection: loadedCollection,
+                                collectionName:
+                                    collection.title, //"CollectionName",
+                              );
+                            })),
                   ),
                 )
               ]),

@@ -47,6 +47,8 @@ List<Middleware<AppState>> appStateMiddleware([
     TypedMiddleware<AppState, UnSetCompleteTaskAction>(saveItems),
     TypedMiddleware<AppState, UnSetCompleteTaskAction>(saveItems),
     TypedMiddleware<AppState, UnSetCompleteTaskAction>(saveItems),
+    TypedMiddleware<AppState, SetCollectionUID>(saveItems),
+    TypedMiddleware<AppState, SetActivityUID>(saveItems),
 
     //// [Account Middlewares]
     TypedMiddleware<AppState, CreateAccountAction>(createAccount),

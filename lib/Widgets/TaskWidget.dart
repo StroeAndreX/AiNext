@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:AiOrganization/Core/AppLocalizations.dart';
+import 'package:AiOrganization/Core/Firebase/CollectionsDB.dart';
 import 'package:AiOrganization/Models/AppState.dart';
 import 'package:AiOrganization/Models/Collection.dart';
 import 'package:AiOrganization/Models/Task.dart';
@@ -92,9 +93,10 @@ class _TaskWidgetState extends State<TaskWidget> {
     SizeConfig().init(context);
 
     return Dismissible(
-      onDismissed: (value) => {
-        store.dispatch(
-            RemoveTaskAction(this.widget.collection, this.widget.task))
+      onDismissed: (value) async {
+        if (store.state.account.isPremium)
+          store.dispatch(
+              RemoveTaskAction(this.widget.collection, this.widget.task));
       },
       confirmDismiss: (DismissDirection direction) => _warningMessage(),
       background: Container(

@@ -54,6 +54,12 @@ class RemoveActivityAction {
   RemoveActivityAction(this.activity);
 }
 
+class RemoveActivityLocallyAction {
+  final Activity activity;
+
+  RemoveActivityLocallyAction(this.activity);
+}
+
 class RemoveSubActivityAction {
   final Activity activity;
   final SubActivity subActivity;
@@ -61,6 +67,47 @@ class RemoveSubActivityAction {
   RemoveSubActivityAction(this.activity, this.subActivity);
 }
 
+class RemoveSubActivityLocallyAction {
+  final Activity activity;
+  final SubActivity subActivity;
+
+  RemoveSubActivityLocallyAction(this.activity, this.subActivity);
+}
+
 class GetActivitiesAction {}
 
 class GetItemsAction {}
+
+class SetActivityUID {
+  final Activity activity;
+  final String uid;
+
+  SetActivityUID(this.activity, this.uid);
+}
+
+/// [Firebase implementation]
+class InsertActivityAction {
+  final Activity activity;
+
+  InsertActivityAction(this.activity);
+}
+
+class ModifyActivityAction {
+  final Activity activity;
+
+  ModifyActivityAction(this.activity);
+}
+
+class InsertSubActivityAction {
+  final Activity activity;
+  final SubActivity subActivity;
+
+  InsertSubActivityAction(this.activity, this.subActivity);
+}
+
+class ModifySubActivityAction {
+  final Activity activity;
+  final SubActivity subActivity;
+
+  ModifySubActivityAction(this.activity, this.subActivity);
+}

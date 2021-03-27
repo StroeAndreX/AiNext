@@ -41,8 +41,6 @@ class _HomePageTasksState extends State<HomePageTasks> {
         .where((collection) => collection.title == widget.collectionName)
         .first;
 
-    print(loadedCollection.toMap().toString());
-
     loadedCollection.tasks.forEach((task) {
       taskWidgets.add(TaskWidget(
         taskName: task.title,

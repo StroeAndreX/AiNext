@@ -1,3 +1,4 @@
+import 'package:AiOrganization/Core/Firebase/ActivitesDB.dart';
 import 'package:AiOrganization/Core/Search.dart';
 import 'package:AiOrganization/Models/Activity.dart';
 import 'package:AiOrganization/Models/SubActivity.dart';
@@ -19,6 +20,15 @@ Reducer<List<Activity>> activitiesReducers = combineReducers<List<Activity>>([
   TypedReducer<List<Activity>, RemoveActivityAction>(removeActivityReducer),
   TypedReducer<List<Activity>, CustomizeActivityAction>(
       customiozeActivityReducer),
+  TypedReducer<List<Activity>, SetActivityUID>(setActivityUID),
+
+  /// [Firebase implementation -> BadOptimization [TODO: Fix in the phase 6[Clean the project]]]
+  TypedReducer<List<Activity>, InsertActivityAction>(insertNewActivity),
+  TypedReducer<List<Activity>, ModifyActivityAction>(modifyActivity),
+  TypedReducer<List<Activity>, InsertSubActivityAction>(
+      insertNewSubActivityReducer),
+  TypedReducer<List<Activity>, ModifySubActivityAction>(
+      modifySubActivityReducer),
 ]);
 
 /// [Create a new Activity and add into the store]
@@ -30,18 +40,25 @@ List<Activity> newActivityReducer(
   /// Call the newID for the new created activity
   int newID = Search.returnNewActivityID();
 
+  /// Create the new Activity
+  Activity newActivity = Activity(
+      id: newID,
+      title: (action.activityName.trim() != "" &&
+              action.activityName.trim() != null)
+          ? action.activityName
+          : "New Activity " + newID.toString(),
+      totalDuration: 0,
+      dateWhenStarted: DateTime.now(),
+      isRunning: false,
+      subActivities: []);
+
+  /// [Firestore implementation]
+  if (store.state.account.isPremium)
+    ActivitiesDB().createNewActivity(newActivity);
+
   return []
     ..addAll(activities)
-    ..add(Activity(
-        id: newID,
-        title: (action.activityName.trim() != "" &&
-                action.activityName.trim() != null)
-            ? action.activityName
-            : "New Activity " + newID.toString(),
-        totalDuration: 0,
-        dateWhenStarted: DateTime.now(),
-        isRunning: false,
-        subActivities: []));
+    ..add(newActivity);
 }
 
 /// [Create a new SubActivity and add into the store]
@@ -69,6 +86,10 @@ List<Activity> addSubActivityReducer(
   altActivity.subActivities.add(subActivity);
   activities[Search.returnActivityIndex(altActivity)] = altActivity;
 
+  /// [Firestore implementation]
+  if (store.state.account.isPremium)
+    ActivitiesDB().addNewSubActivity(altActivity, subActivity);
+
   /// Save into the store
   return activities;
 }
@@ -85,6 +106,10 @@ List<Activity> customiozeActivityReducer(
   /// Alter the activity object
   Activity alterActivity = altActivity.copyWith(title: action.newActivityName);
   activities[Search.returnActivityIndex(altActivity)] = alterActivity;
+
+  /// [Firestore implementation]
+  if (store.state.account.isPremium)
+    ActivitiesDB().modfiyActivity(alterActivity);
 
   /// Save into the store
   return activities;
@@ -103,6 +128,9 @@ List<Activity> runActivityReducer(
   altActivity =
       altActivity.copyWith(dateWhenStarted: newStartDateTime, isRunning: true);
   activities[Search.returnActivityIndex(altActivity)] = altActivity;
+
+  /// [Firestore implementation]
+  if (store.state.account.isPremium) ActivitiesDB().modfiyActivity(altActivity);
 
   /// Save into the store
   return activities;
@@ -132,6 +160,9 @@ List<Activity> stopActivityReducer(
 
   /// Save the new state of the Activity object into the list of Activities
   activities[Search.returnActivityIndex(altActivity)] = altActivity;
+
+  /// [Firestore implementation]
+  if (store.state.account.isPremium) ActivitiesDB().modfiyActivity(altActivity);
 
   /// Save into the sotre
   return activities;
@@ -167,6 +198,10 @@ List<Activity> runSubActivityReducer(
         dateWhenStarted: newStartDateTime,
         isRunning: true,
         subActivities: altActivity.subActivities);
+
+    /// [Firestore implementation]
+    if (store.state.account.isPremium)
+      ActivitiesDB().modfiyActivity(altActivity);
   } else {
     altActivity =
         altActivity.copyWith(subActivities: altActivity.subActivities);
@@ -174,6 +209,10 @@ List<Activity> runSubActivityReducer(
 
   /// Save the new state of the Activity Object into the list of Activities
   activities[Search.returnActivityIndex(altActivity)] = altActivity;
+
+  /// [Firestore implementation]
+  if (store.state.account.isPremium)
+    ActivitiesDB().modfiySubActivity(altActivity, altSubActivity);
 
   /// Save into the sotre
   return activities;
@@ -208,9 +247,24 @@ List<Activity> stopSubActivityReducer(
     altActivity =
         altActivity.copyWith(subActivities: altActivity.subActivities);
     activities[Search.returnActivityIndex(altActivity)] = altActivity;
+
+    /// [Firestore implementation]
+    if (store.state.account.isPremium)
+      ActivitiesDB().modfiySubActivity(altActivity, altSubActivity);
   }
 
   /// Save into the store
+  return activities;
+}
+
+/// [Remove an Activity from the list --> Needed for @Firestore implementation]
+List<Activity> removeActivityLocallyReducer(
+    List<Activity> activities, RemoveActivityLocallyAction action) {
+  /// Action @par - The activity
+
+  // Remove activity from list
+  activities.remove(action.activity);
+
   return activities;
 }
 
@@ -221,6 +275,10 @@ List<Activity> removeActivityReducer(
 
   // Remove activity from list
   activities.remove(action.activity);
+
+  /// [Firestore implementation]
+  if (store.state.account.isPremium)
+    ActivitiesDB().removeActivity(action.activity);
 
   return activities;
 }
@@ -246,6 +304,10 @@ List<Activity> removeSubActivityReducer(
   // Insert the altActivity to collections List
   activities[Search.returnActivityIndex(altActivity)] = altActivity;
 
+  /// [Firestore implementation]
+  if (store.state.account.isPremium)
+    ActivitiesDB().removeSubActivity(altActivity, action.subActivity);
+
   /// Return the new list of collections
   return activities;
 }
@@ -254,4 +316,68 @@ List<Activity> removeSubActivityReducer(
 List<Activity> loadItemsReducer(
     List<Activity> activities, LoadedItemsAction action) {
   return action.activities;
+}
+
+/// [Set the Document UID of the collection --> Firebase implementation]
+List<Activity> setActivityUID(
+    List<Activity> activities, SetActivityUID action) {
+  /// Action @par - The Collection
+  /// Action @par - The uid
+
+  /// Call the  parameter Collection into a new variabile to alterate
+  Activity altActivity = action.activity;
+
+  /// Alter the collection object
+  altActivity = altActivity.copyWith(uid: action.uid);
+  activities[Search.returnActivityIndex(action.activity)] = altActivity;
+
+  /// Save into the store
+  return activities;
+}
+
+//
+///// [Activities Implementation]
+//
+
+List<Activity> insertNewActivity(
+    List<Activity> activities, InsertActivityAction action) {
+  /// Add the fetched activity into the list [Obsolet as the ids might cause issues --> To fix in the phase 6]
+  return []
+    ..addAll(activities)
+    ..add(action.activity);
+}
+
+List<Activity> modifyActivity(
+    List<Activity> activities, ModifyActivityAction action) {
+  Activity modifiedActivity = action.activity;
+
+  activities[Search.returnActivityIndex(modifiedActivity)] = modifiedActivity;
+
+  return activities;
+}
+
+List<Activity> insertNewSubActivityReducer(
+    List<Activity> activities, InsertSubActivityAction action) {
+  SubActivity newSubActivity = action.subActivity;
+  Activity altActivity = action.activity;
+
+  altActivity.subActivities.add(newSubActivity);
+
+  activities[Search.returnActivityIndex(altActivity)] = altActivity;
+
+  return activities;
+}
+
+List<Activity> modifySubActivityReducer(
+    List<Activity> activities, ModifySubActivityAction action) {
+  SubActivity subActivityState = action.subActivity;
+  Activity altActivity = action.activity;
+
+  altActivity.subActivities[
+          Search.returnSubActivityIndex(action.activity, action.subActivity)] =
+      subActivityState;
+
+  activities[Search.returnActivityIndex(altActivity)] = altActivity;
+
+  return activities;
 }

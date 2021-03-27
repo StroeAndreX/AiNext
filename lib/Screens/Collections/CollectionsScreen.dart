@@ -1,4 +1,6 @@
+import 'package:AiOrganization/Core/Firebase/CollectionsListeners/CollectionsDBListeners.dart';
 import 'package:AiOrganization/Models/AppState.dart';
+import 'package:AiOrganization/Redux/Store.dart';
 import 'package:AiOrganization/Redux/ViewModels/CollectionsVM.dart';
 import 'package:AiOrganization/Screens/Collections/CollectionsHeader.dart';
 import 'package:AiOrganization/Screens/Collections/CollectionsTabs.dart';
@@ -16,6 +18,14 @@ class CollectionsScreen extends StatefulWidget {
 }
 
 class _CollectionsScreenState extends State<CollectionsScreen> {
+  @override
+  void initState() {
+    if (store.state.account.isPremium)
+      CollectionsDBListeners().listenToCollections();
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     double bottomPadding = MediaQuery.of(context).padding.bottom;

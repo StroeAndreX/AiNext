@@ -1,3 +1,4 @@
+import 'package:AiOrganization/Core/Firebase/ActivitiesListeners/ActivitiesDBListeners.dart';
 import 'package:AiOrganization/Core/Search.dart';
 import 'package:AiOrganization/Models/Activity.dart';
 import 'package:AiOrganization/Models/AppState.dart';
@@ -78,12 +79,16 @@ class _SubActivitiesScreenState extends State<SubActivitiesScreen> {
                 converter: (Store<AppState> store) =>
                     ActivitiesVM.create(store),
                 builder: (BuildContext context, ActivitiesVM activitiesVM) =>
+                    Column(
+                  children: [
                     SubActivitiesHeader(
-                  activity: widget.activity,
+                      activity: widget.activity,
+                    ),
+                    SubActivitiesLabel(widget.activity),
+                  ],
                 ),
               ),
             ),
-            SubActivitiesLabel(widget.activity),
             StoreConnector<AppState, ActivitiesVM>(
               converter: (Store<AppState> store) => ActivitiesVM.create(store),
               builder: (BuildContext context, ActivitiesVM activitiesVM) {

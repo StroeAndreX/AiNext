@@ -7,6 +7,8 @@ import 'package:AiOrganization/Redux/Store.dart';
 class Search {
   /// [Return Indexed]
   static int returnCollectionIndex(Collection collection) {
+    print(collection.toString());
+
     return store.state.collections
         .indexWhere((collectionInList) => collectionInList.id == collection.id);
   }

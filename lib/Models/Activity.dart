@@ -11,8 +11,12 @@ class Activity {
   final DateTime dateWhenStarted;
   final bool isRunning;
 
+  /// Firebase intergration [@Only Premium]
+  final String uid;
+
   Activity(
-      {this.title,
+      {this.uid,
+      this.title,
       this.totalDuration,
       this.id,
       this.subActivities,
@@ -20,6 +24,7 @@ class Activity {
       this.isRunning = false});
 
   Activity copyWith({
+    String uid,
     String title,
     int totalDuration,
     int id,
@@ -28,6 +33,7 @@ class Activity {
     DateTime dateWhenStarted,
   }) {
     return Activity(
+        uid: uid ?? this.uid,
         id: id ?? this.id,
         title: title ?? this.title,
         totalDuration: totalDuration ?? this.totalDuration,
@@ -37,7 +43,8 @@ class Activity {
   }
 
   Activity.fromMap(Map activity, List<SubActivity> subActivities)
-      : id = activity['id'],
+      : uid = activity['uid'],
+        id = activity['id'],
         title = activity['title'],
         totalDuration = activity['totalDuration'],
         subActivities = subActivities,
@@ -47,6 +54,17 @@ class Activity {
         isRunning = activity['isRunning'];
 
   Map<String, dynamic> toMap() => {
+        'id': (id as int),
+        'title': title,
+        'totalDuration': totalDuration,
+        'subActivities':
+            jsonEncode(subActivities.map((e) => e.toMap()).toList()),
+        'dateWhenStarted': dateWhenStarted.millisecondsSinceEpoch ?? 0,
+        'isRunning': isRunning ?? false,
+        'uid': uid
+      };
+
+  Map<String, dynamic> toMapFirestore() => {
         'id': (id as int),
         'title': title,
         'totalDuration': totalDuration,

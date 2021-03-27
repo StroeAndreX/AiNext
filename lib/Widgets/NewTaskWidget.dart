@@ -58,6 +58,9 @@ class _NewTaskWidgetState extends State<NewTaskWidget> {
       store.dispatch(
           NewCollectionAction(collectionName, collectionType, newTask));
     } else {
+      collection = store.state.collections.firstWhere(
+          (collection) => collection.title == widget.collectionName);
+
       /// Declare the new id assigned to the next created task
       int newID = Search.returnNewTaskID(collection);
 

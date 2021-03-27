@@ -1,4 +1,6 @@
+import 'package:AiOrganization/Core/Firebase/ActivitiesListeners/ActivitiesDBListeners.dart';
 import 'package:AiOrganization/Models/AppState.dart';
+import 'package:AiOrganization/Redux/Store.dart';
 import 'package:AiOrganization/Redux/ViewModels/ActivitiesVM.dart';
 import 'package:AiOrganization/Screens/Activities/ActivitiesHeader.dart';
 import 'package:AiOrganization/Screens/Activities/ActivitiesTabs.dart';
@@ -15,6 +17,14 @@ class ActivitiesScreen extends StatefulWidget {
 }
 
 class _ActivitiesScreenState extends State<ActivitiesScreen> {
+  @override
+  void initState() {
+    if (store.state.account.isPremium)
+      ActivitiesDBListeners().listenToActivities();
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     double bottomPadding = MediaQuery.of(context).padding.bottom;

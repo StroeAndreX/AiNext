@@ -65,6 +65,14 @@ class _MyAppState extends State<MyApp> {
     super.didChangeDependencies();
   }
 
+  //
+  /// Huge challenge and test in firebase listeners and management [Dangerous] --> Could cost a lot of money
+  //
+
+  ///
+  /// [Firestore implementation management] --> TODO: Ultra Optimization using In-App checking and avoiding useless writings or readings || Phase 6 of AiOrganziation [The Ultra optimization]
+  ///
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {

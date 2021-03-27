@@ -39,3 +39,17 @@ class CustomizeTaskNameAction {
 
   CustomizeTaskNameAction(this.collection, this.task, this.taskName);
 }
+
+class NewTaskState {
+  final Task task;
+  final Collection collection;
+
+  NewTaskState(this.task, this.collection);
+}
+
+class InsertNewTask {
+  final Collection collection;
+  final Task task;
+
+  InsertNewTask(this.collection, this.task);
+}

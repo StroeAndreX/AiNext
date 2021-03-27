@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:AiOrganization/Core/Firebase/CollectionsDB.dart';
 import 'package:AiOrganization/Models/Collection.dart';
 import 'package:AiOrganization/Redux/Actions/CollectionActions.dart';
 import 'package:AiOrganization/Redux/Store.dart';
@@ -72,8 +73,9 @@ class _CollectionTabWidgetState extends State<CollectionTabWidget> {
 
     return Dismissible(
       key: Key(widget.collection.id.toString()),
-      onDismissed: (value) =>
-          {store.dispatch(RemoveCollectionAction(this.widget.collection))},
+      onDismissed: (value) {
+        store.dispatch(RemoveCollectionAction(this.widget.collection));
+      },
       confirmDismiss: (DismissDirection direction) => _warningMessage(),
       background: Container(
           padding: EdgeInsets.symmetric(horizontal: 20),
