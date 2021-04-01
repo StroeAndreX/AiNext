@@ -45,8 +45,6 @@ List<Middleware<AppState>> appStateMiddleware([
     TypedMiddleware<AppState, RemoveTaskAction>(saveItems),
     TypedMiddleware<AppState, SetCompleteTaskAction>(saveItems),
     TypedMiddleware<AppState, UnSetCompleteTaskAction>(saveItems),
-    TypedMiddleware<AppState, UnSetCompleteTaskAction>(saveItems),
-    TypedMiddleware<AppState, UnSetCompleteTaskAction>(saveItems),
     TypedMiddleware<AppState, SetCollectionUID>(saveItems),
     TypedMiddleware<AppState, SetActivityUID>(saveItems),
 

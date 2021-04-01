@@ -23,6 +23,8 @@ class ActivitiesDBListeners {
       int allActivitiesChangesLength = activities.docChanges.length;
 
       print("Activities: " + activities.docs.length.toString());
+      print(activities.toString());
+
       if (allActivitiesChangesLength > allActivitiesLength) {
         Map<String, dynamic> removedActivityData =
             activities.docChanges.first.doc.data();
@@ -49,6 +51,11 @@ class ActivitiesDBListeners {
         if (activityExist == -1) {
           store.dispatch(InsertActivityAction(newActivity));
         } else {
+          Activity activity = store.state.activities.elementAt(activityExist);
+
+          newActivity =
+              newActivity.copyWith(subActivities: activity.subActivities);
+          print("Activities: " + newActivity.toString());
           store.dispatch(ModifyActivityAction(newActivity));
         }
       });
@@ -64,6 +71,9 @@ class ActivitiesDBListeners {
         store.state.activities[Search.returnActivityIndex(activity)];
 
     _listenToUserSubActivities.snapshots().listen((subActivities) {
+      updatedActivity =
+          store.state.activities[Search.returnActivityIndex(activity)];
+
       bool found = false;
       subActivities.docChanges.forEach((docChanged) {
         subActivities.docs.forEach((doc) {
@@ -72,8 +82,6 @@ class ActivitiesDBListeners {
             return;
           }
         });
-
-        print("Found: " + found.toString());
       });
 
       if (!found) {
@@ -83,7 +91,6 @@ class ActivitiesDBListeners {
         SubActivity altSubActivity =
             SubActivity.fromMap(removedSubActivityData);
 
-        print("Remove this..." + altSubActivity.toString());
         store.dispatch(
             RemoveSubActivityLocallyAction(updatedActivity, altSubActivity));
       }

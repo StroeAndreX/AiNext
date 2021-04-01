@@ -33,9 +33,6 @@ class _NewCollectionWidgetState extends State<NewCollectionWidget> {
 
                 collectionsVM.newEmptyCollection(collectionName);
 
-                print("Collections: " +
-                    store.state.collections.length.toString());
-
                 Navigator.push(
                   context,
                   MaterialPageRoute(

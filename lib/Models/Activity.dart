@@ -68,8 +68,6 @@ class Activity {
         'id': (id as int),
         'title': title,
         'totalDuration': totalDuration,
-        'subActivities':
-            jsonEncode(subActivities.map((e) => e.toMap()).toList()),
         'dateWhenStarted': dateWhenStarted.millisecondsSinceEpoch ?? 0,
         'isRunning': isRunning ?? false,
       };

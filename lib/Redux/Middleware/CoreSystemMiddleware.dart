@@ -37,8 +37,6 @@ class CoreSystemMiddleware {
           DocumentSnapshot _documentSnapshot =
               await AccountDB().queryTheUserAccount(newAccountState);
 
-          print("DocumentSnapshot $_documentSnapshot");
-
           /// Here is the check for existance
           if (_documentSnapshot.exists) {
             /// Get the data from the documentSnapshot
@@ -79,9 +77,6 @@ class CoreSystemMiddleware {
     var collectionsJSON =
         jsonEncode(collections.map((e) => e.toMap()).toList());
 
-    print("ActivitiesJSON: " + activitiesJSON);
-    print("CollectionsJSON: " + collectionsJSON);
-
     //var string = json.encode(activitiesMap);
     await preferences.setString('activitiesState', activitiesJSON);
     await preferences.setString('collectionsState', collectionsJSON);
@@ -113,11 +108,6 @@ class CoreSystemMiddleware {
 
         return Collection.fromMap(i, collectionTask);
       }).toList();
-
-      print("ActivitiesJSON: " + activitiesJSON.toString());
-      print("CollectionsJSON: " + collectionsJSON.toString());
-
-      //print("ActivitiesMiddleware: " + activities.toString());
 
       return AppState(
           activities: activities ?? [], collections: collections ?? []);

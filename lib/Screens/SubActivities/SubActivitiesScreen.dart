@@ -34,7 +34,7 @@ class SubActivitiesScreen extends StatefulWidget {
 
 class _SubActivitiesScreenState extends State<SubActivitiesScreen> {
   /// Declare the list where all the Activity Tabs are going to be stored and displayed [TODO: Implement a limit of 20 activityTabs loaded xTime. LazyLoading]s
-  List<Widget> subActvitiesWidgets = [];
+  List<Widget> subActivitiesWidgets = [];
 
   /// Loaded activity that is been displayed in the currentScreen
   Activity loadedActivity;
@@ -44,21 +44,25 @@ class _SubActivitiesScreenState extends State<SubActivitiesScreen> {
     loadedActivity =
         store.state.activities[Search.returnActivityIndex(widget.activity)];
 
+    if (store.state.account.isPremium)
+      ActivitiesDBListeners().listenToSubActivtiesActivity(loadedActivity);
     // TODO: implement initState
     super.initState();
   }
 
   void tasks() {
     /// Clean the list
-    subActvitiesWidgets = [];
+    subActivitiesWidgets = [];
+
+    print("LoadedStuff: " + loadedActivity.toString());
 
     /// For each subActivity the user created, build a tab[Widget]
-    widget.activity.subActivities.forEach((subActivity) {
-      subActvitiesWidgets.add(SubActivityTabWidget(
+    loadedActivity.subActivities.forEach((subActivity) {
+      subActivitiesWidgets.add(SubActivityTabWidget(
         subActivity: subActivity,
         activity: loadedActivity,
       ));
-      subActvitiesWidgets.add(SizedBox(height: 10));
+      subActivitiesWidgets.add(SizedBox(height: 10));
     });
   }
 
@@ -92,6 +96,9 @@ class _SubActivitiesScreenState extends State<SubActivitiesScreen> {
             StoreConnector<AppState, ActivitiesVM>(
               converter: (Store<AppState> store) => ActivitiesVM.create(store),
               builder: (BuildContext context, ActivitiesVM activitiesVM) {
+                loadedActivity = store.state
+                    .activities[Search.returnActivityIndex(widget.activity)];
+
                 tasks();
                 return Column(
                   children: [
@@ -104,7 +111,7 @@ class _SubActivitiesScreenState extends State<SubActivitiesScreen> {
                         context: context,
                         removeTop: true,
                         child: ListView(
-                          children: subActvitiesWidgets,
+                          children: subActivitiesWidgets,
                         ),
                       ),
                     ),

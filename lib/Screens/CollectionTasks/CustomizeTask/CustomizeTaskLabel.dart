@@ -106,7 +106,6 @@ class _CustomizeTaskLabelState extends State<CustomizeTaskLabel> {
     /// Clear the Label list
     labelsWidgets = [];
 
-    print(loadedLabels.toString());
     loadedLabels.forEach((label) {
       labelsWidgets.add(GestureDetector(
         onTap: () {

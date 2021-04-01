@@ -38,9 +38,6 @@ class _SubActivitiesHeaderState extends State<SubActivitiesHeader> {
     loadedActivity =
         store.state.activities[Search.returnActivityIndex(widget.activity)];
 
-    if (store.state.account.isPremium)
-      ActivitiesDBListeners().listenToSubActivtiesActivity(loadedActivity);
-
     calculateActivityTotalDuration();
     // TODO: implement initState
     super.initState();
@@ -116,6 +113,7 @@ class _SubActivitiesHeaderState extends State<SubActivitiesHeader> {
 
   @override
   Widget build(BuildContext context) {
+    print("State");
     return Container(
         height: SizeConfig.getProportionateScreenHeight(100),
         child: Stack(

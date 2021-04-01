@@ -34,7 +34,6 @@ class _CustomizeTaskDateButtonState extends State<CustomizeTaskDateButton> {
   Widget build(BuildContext context) {
     loadedTask = widget.task;
 
-    print(loadedTask.toMap().toString());
     return Container(
       padding: EdgeInsets.symmetric(
           vertical: SizeConfig.getProportionateScreenHeight(10)),

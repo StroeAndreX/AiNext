@@ -52,8 +52,6 @@ class CollectionsDB {
 
   /// [Insert new Tasks into the subDocument @Tasks of the collectionDocument on firestore]
   Future<void> addNewTask(Collection collection, Task newTask) async {
-    print("Wtf: " + collection.uid.toString());
-
     /// [Checker] ---> Ensure the existance of the Collection into the firestore document:: If it has the [@uid] setted, then exists on firestore
     if (collection.uid != null && collection.uid.trim() != "") {
       /// Call the subDocument contianing all the Tasks

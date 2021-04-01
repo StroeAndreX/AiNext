@@ -268,10 +268,11 @@ List<Collection> customiozeCollectionIconReducer(
 List<Collection> setCompleteTaskReducer(
     List<Collection> collections, SetCompleteTaskAction action) {
   /// Action @par - The Collection
-  /// Action @par - The Taks
+  /// Action @par - The Task
 
   /// Call the  parameter Collection into a new variabile to alterate
-  Collection altCollection = action.collection;
+  Collection altCollection = store.state.collections
+      .firstWhere((collection) => collection.id == action.collection.id);
 
   /// Call the List of tasks from the given collection
   List<Task> tasks = altCollection.tasks;
@@ -289,7 +290,7 @@ List<Collection> setCompleteTaskReducer(
 
   /// [Firestore]
   if (store.state.account.isPremium)
-    CollectionsDB().modfiyTasks(altCollection, altTask);
+    CollectionsDB().modfiyTasks(alterCollection, altTask);
 
   /// Save into the store
   return collections;
@@ -302,7 +303,8 @@ List<Collection> unsetCompleteTaskReducer(
   /// Action @par - The Taks
 
   /// Call the  parameter Collection into a new variabile to alterate
-  Collection altCollection = action.collection;
+  Collection altCollection = store.state.collections
+      .firstWhere((collection) => collection.id == action.collection.id);
 
   /// Call the List of tasks from the given collection
   List<Task> tasks = altCollection.tasks;
@@ -320,7 +322,7 @@ List<Collection> unsetCompleteTaskReducer(
 
   /// [Firestore]
   if (store.state.account.isPremium)
-    CollectionsDB().modfiyTasks(altCollection, altTask);
+    CollectionsDB().modfiyTasks(alterCollection, altTask);
 
   /// Save into the store
   return collections;
@@ -337,8 +339,6 @@ List<Collection> setCollectionUID(
     List<Collection> collections, SetCollectionUID action) {
   /// Action @par - The Collection
   /// Action @par - The uid
-
-  print("This reducer should fawking work: " + action.uid);
 
   /// Call the  parameter Collection into a new variabile to alterate
   Collection altCollection = action.collection;

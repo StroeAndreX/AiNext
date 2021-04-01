@@ -60,8 +60,7 @@ class _InitScreenState extends State<InitScreen> {
         return SingleChildScrollView(child: ActivitiesScreen());
         break;
       case 3:
-        return MyHomePage(
-            title: "Liz"); //CalendarScreen(); //MyHomePage(title: "Liz");
+        return CalendarScreen(); //MyHomePage(title: "Liz");
         break;
 
       default:
@@ -91,8 +90,6 @@ class _InitScreenState extends State<InitScreen> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     ColorsConfig().init(context);
-
-    print(store.state.account.toMap().toString());
 
     return StoreConnector<AppState, dynamic>(
       converter: (Store<AppState> store) => null,

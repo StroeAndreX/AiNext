@@ -351,6 +351,8 @@ List<Activity> modifyActivity(
     List<Activity> activities, ModifyActivityAction action) {
   Activity modifiedActivity = action.activity;
 
+  print("Modified: " + modifiedActivity.toString());
+
   activities[Search.returnActivityIndex(modifiedActivity)] = modifiedActivity;
 
   return activities;

@@ -13,6 +13,8 @@ class CollectionsDBListeners {
   /// [Read in-real-time the tasks in the collection]
   Future<void> listenToCollectionCalendarTasks(String collectionName) async {
     /// TODO: Check if we already have the id --- Reducing the reading
+    Collection collection = store.state.collections.firstWhere(
+        (collectionStore) => collectionStore.title == collectionName);
 
     /// Collection uid
     String collectionUID;
@@ -55,6 +57,9 @@ class CollectionsDBListeners {
 
     /// Listen to each task stored in the queried Collection
     collectionTasksReference.snapshots().listen((tasks) {
+      collection = store.state.collections.firstWhere(
+          (collectionStore) => collectionStore.title == collectionName);
+
       int tasksLength = tasks.docs.length;
       int tasksChangesLength = tasks.docChanges.length;
 
@@ -92,8 +97,10 @@ class CollectionsDBListeners {
   }
 
   /// [Read in-real-time all tasks in the collectionss]
-  Future<void> listenToCollectionTasks(Collection collection) async {
+  Future<void> listenToCollectionTasks(Collection collectionPar) async {
     /// TODO: Check if we already have the id --- Reducing the reading
+    Collection collection = store.state.collections.firstWhere(
+        (collectionStore) => collectionStore.id == collectionPar.id);
 
     /// Query the tasks
     CollectionReference collectionTasksReference =
@@ -101,8 +108,8 @@ class CollectionsDBListeners {
 
     /// Listen to each task stored in the queried Collection
     collectionTasksReference.snapshots().listen((tasks) {
-      int tasksLength = tasks.docs.length;
-      int tasksChangesLength = tasks.docChanges.length;
+      collection = store.state.collections.firstWhere(
+          (collectionStore) => collectionStore.id == collectionPar.id);
 
       bool found = false;
       tasks.docChanges.forEach((docChanged) {
@@ -112,12 +119,7 @@ class CollectionsDBListeners {
             return;
           }
         });
-
-        print("Found: " + found.toString());
       });
-
-      print("tasksLength: " + tasksLength.toString());
-      print("tasksChangesLength: " + tasksChangesLength.toString());
 
       if (!found) {
         Map<String, dynamic> removedTaskData =
@@ -125,7 +127,6 @@ class CollectionsDBListeners {
 
         Task altTask = Task.fromMap(removedTaskData);
 
-        print("Remove this..." + altTask.toString());
         store.dispatch(RemoveLocalTaskAction(collection, altTask));
       }
 
@@ -133,6 +134,8 @@ class CollectionsDBListeners {
         print("No elements in the list");
         return;
       }
+
+      print("Collection from this function: " + collection.toString());
 
       int taskExist;
       tasks.docs.forEach((task) {
@@ -194,6 +197,8 @@ class CollectionsDBListeners {
         if (collectionExist == -1) {
           store.dispatch(InsertNewCollection(newCollection));
         } else {
+          newCollection = newCollection.copyWith(
+              tasks: store.state.collections.elementAt(collectionExist).tasks);
           store.dispatch(ModifyCollection(newCollection));
         }
       });

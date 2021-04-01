@@ -50,7 +50,7 @@ class _CustomizeTaskLabelState extends State<CustomizeCollectionColors> {
     ColorsConfig.colorLabels.forEach((color) {
       widgets.add(GestureDetector(
         onTap: () {
-          print("What the hell?");
+
           store.dispatch(
               CustomizeCollectionColorAction(loadedCollection, color));
         },

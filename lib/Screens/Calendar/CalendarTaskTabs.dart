@@ -145,8 +145,6 @@ class _CalendarTaskTabsState extends State<CalendarTaskTabs> {
           getCalendarTypeCollections(collectionsVM);
           buildTasks();
 
-          print("CollectionTitle: " + collectionTitle.toString());
-
           return Stack(
             children: [
               Container(

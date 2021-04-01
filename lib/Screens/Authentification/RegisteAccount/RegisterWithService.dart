@@ -37,9 +37,6 @@ class _RegisterWithServiceState extends State<RegisterWithService> {
                   onPressed: () async {
                     await accountVM.signOut();
 
-                    print(
-                        "Great Success or Great Fail: ${store.state.account}");
-
                     await accountVM
                         .signInWithGoogle()
                         .onError((error, stackTrace) => print(error));

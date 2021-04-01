@@ -55,7 +55,7 @@ class _CollectionTasksScreenState extends State<CollectionTasksScreen> {
     super.initState();
   }
 
-  void tasks(CollectionsVM collectionsVM) {
+  void tasks(Collection collection) {
     taskWidgets = [];
     labels = [];
 
@@ -68,7 +68,7 @@ class _CollectionTasksScreenState extends State<CollectionTasksScreen> {
         taskName: task.title,
         totalDuration: task.notes.toString(),
         task: task,
-        collection: widget.collection,
+        collection: collection,
         panelController: _panel,
         function: openThePanel,
       ));
@@ -195,7 +195,7 @@ class _CollectionTasksScreenState extends State<CollectionTasksScreen> {
                 ? CustomizeTaskPanel(
                     task: loadTask,
                     changePanelSize: changePanelSize,
-                    collection: widget.collection,
+                    collection: collection,
                     panelController: _panel,
                     resetPanel: resetPanel,
                   )
@@ -212,17 +212,17 @@ class _CollectionTasksScreenState extends State<CollectionTasksScreen> {
               },
               child: Column(children: [
                 CollectionTasksHeader(
-                    panelController: _panel, collection: widget.collection),
+                    panelController: _panel, collection: collection),
                 //CollectionTasksBody(),
                 StoreConnector<AppState, CollectionsVM>(
                   converter: (Store<AppState> store) =>
                       CollectionsVM.create(store),
                   builder: (BuildContext context, CollectionsVM collectionsVM) {
                     collection = collectionsVM.collections
-                        .where((element) => element.id == widget.collection.id)
+                        .where((element) => element.id == collection.id)
                         .first;
 
-                    tasks(collectionsVM);
+                    tasks(collection);
 
                     return Column(
                       children: [

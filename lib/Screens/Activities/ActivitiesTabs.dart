@@ -44,7 +44,6 @@ class _ActivitiesTabsState extends State<ActivitiesTabs> {
       child: StoreConnector<AppState, ActivitiesVM>(
           converter: (Store<AppState> store) => ActivitiesVM.create(store),
           builder: (BuildContext context, ActivitiesVM activitiesVM) {
-            print("Rebuild?");
             buildActivitiesTabs(activitiesVM);
             return Column(
               children: [

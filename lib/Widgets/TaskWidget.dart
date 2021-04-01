@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:AiOrganization/Core/AppLocalizations.dart';
-import 'package:AiOrganization/Core/Firebase/CollectionsDB.dart';
 import 'package:AiOrganization/Models/AppState.dart';
 import 'package:AiOrganization/Models/Collection.dart';
 import 'package:AiOrganization/Models/Task.dart';
@@ -14,7 +12,6 @@ import 'package:AiOrganization/Styles/TextStylesConstants.dart';
 import 'package:AiOrganization/Widgets/CustomAlertDialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:redux/redux.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -91,6 +88,8 @@ class _TaskWidgetState extends State<TaskWidget> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
+
+    print("TaskWidget: " + widget.collection.toString());
 
     return Dismissible(
       onDismissed: (value) async {

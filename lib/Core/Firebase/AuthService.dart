@@ -108,7 +108,6 @@ class AuthService {
     await _user.reload();
     await _user.reload();
 
-    print(_user);
     User reloadedUser = auth.currentUser;
 
     return reloadedUser;

@@ -45,8 +45,6 @@ class AccountMiddleware {
       next(action);
 
       await _authService.signInWithGoogle().then((value) async {
-        print("I'm here");
-
         /// Initialize a new [object @Account] that contain the information of the created account on FirebaseAuth
         Account googleCreatedAccount = store.state.account.copyWith(
             uid: value.user.uid,
@@ -60,8 +58,6 @@ class AccountMiddleware {
         /// Get the account information from the store if the document exists
         DocumentSnapshot _documentSnapshot =
             await AccountDB().queryTheUserAccount(googleCreatedAccount);
-
-        print("DocumentSnapshot $_documentSnapshot");
 
         /// Here is the check for existance
         if (_documentSnapshot.exists) {
