@@ -1,11 +1,19 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:AiOrganization/Core/AppLocalizations.dart';
 import 'package:AiOrganization/Core/LanguageConstants.dart';
 import 'package:AiOrganization/Models/AppState.dart';
 import 'package:AiOrganization/Redux/Actions/ActivitiesActions.dart';
 import 'package:AiOrganization/Screens/InitScreen.dart';
+import 'package:AiOrganization/VoiceAssistant/TextToSpeechAPI.dart';
+import 'package:AiOrganization/VoiceAssistant/Voice.dart';
+import 'package:audioplayers/audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:redux/redux.dart';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -68,6 +76,14 @@ class _MyAppState extends State<MyApp> {
 
   ///
   /// [Firestore implementation management] --> TODO: Ultra Optimization using In-App checking and avoiding useless writings or readings || Phase 6 of AiOrganziation [The Ultra optimization]
+  ///
+
+  //
+  /// Initialized the LIZ Phase4: LZN0 - Only precreated messages as it's very [Dangerous] to leat user mess with her --> Could cost a lot of money
+  //
+
+  ///
+  /// [LiZ Implementation] --> TODO: Ultra Optimization using In-App checking and avoiding useless writings or readings || Letting the user mess with LiZ || Phase 6 of AiOrganziation [The Ultra optimization]
   ///
 
   // This widget is the root of your application.

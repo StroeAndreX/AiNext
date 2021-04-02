@@ -14,7 +14,8 @@ class CollectionsDBListeners {
   Future<void> listenToCollectionCalendarTasks(String collectionName) async {
     /// TODO: Check if we already have the id --- Reducing the reading
     Collection collection = store.state.collections.firstWhere(
-        (collectionStore) => collectionStore.title == collectionName);
+        (collectionStore) => collectionStore.title == collectionName,
+        orElse: () => Collection());
 
     /// Collection uid
     String collectionUID;
@@ -50,6 +51,8 @@ class CollectionsDBListeners {
       loadedCollection = collectionsInStore
           .firstWhere((collection) => collection.title == collectionName);
     }
+
+    print("CollectionData: " + loadedCollection.toString());
 
     /// Query the tasks
     CollectionReference collectionTasksReference =

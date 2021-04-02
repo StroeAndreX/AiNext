@@ -1,3 +1,4 @@
+import 'package:AiOrganization/Core/Firebase/CollectionsListeners/CollectionsDBListeners.dart';
 import 'package:AiOrganization/Models/AppState.dart';
 import 'package:AiOrganization/Models/Collection.dart';
 import 'package:AiOrganization/Models/Task.dart';
@@ -60,6 +61,10 @@ class _CalendarTaskTabsState extends State<CalendarTaskTabs> {
     setState(() {
       collectionTitle = selectedDate.millisecondsSinceEpoch.toString();
     });
+
+    /// Set the collection name with the millisecondsSinceEpoch so I can easily access it in calendar
+    if (store.state.account.isPremium)
+      CollectionsDBListeners().listenToCollectionCalendarTasks(collectionTitle);
   }
 
   /// [Build all the tasks connected to the @selectedDate]

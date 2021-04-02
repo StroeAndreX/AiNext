@@ -1,11 +1,13 @@
 import 'package:AiOrganization/VoiceAssistant/TextToSpeechAPI.dart';
 import 'package:AiOrganization/VoiceAssistant/Voice.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:audioplayers/audioplayers.dart';
-//import 'package:audioplayer/audioplayer.dart';
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
+
+import 'package:audioplayers/audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -19,15 +21,23 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List<Voice> _voices = [];
   Voice _selectedVoice;
+  AudioCache audioCache = AudioCache();
   AudioPlayer audioPlugin = AudioPlayer();
   final TextEditingController _searchQuery = TextEditingController();
 
   initState() {
     super.initState();
+
+    if (kIsWeb) {
+      // Calls to Platform.isIOS fails on web
+      return;
+    }
+
     getVoices();
   }
 
   void synthesizeText(String text, String name) async {
+    print("Text: " + text);
     if (audioPlugin.state == AudioPlayerState.PLAYING) {
       await audioPlugin.stop();
     }

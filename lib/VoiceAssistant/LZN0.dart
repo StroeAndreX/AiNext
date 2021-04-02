@@ -1,0 +1,1 @@
+class LZN0 {}

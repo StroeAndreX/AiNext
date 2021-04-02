@@ -60,6 +60,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
     collectionName = now.millisecondsSinceEpoch
         .toString(); //now.day.toString() + month.toString();
 
+    print("Why?: " + collectionName);
+
     if (store.state.account.isPremium)
       CollectionsDBListeners().listenToCollectionCalendarTasks(collectionName);
 

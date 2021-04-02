@@ -25,12 +25,9 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  # audioplayer: 0.8.1
-  audioplayers: ^0.18.1
-  audioplayer_web: 0.7.1
+  audioplayers: ^0.18.3
   auto_size_text_field: ^0.1.7
   cloud_firestore: ^1.0.2
-  crypto: ^3.0.0
   cupertino_icons: ^1.0.2
   email_validator: ^1.0.6
   firebase: ^9.0.1
@@ -51,6 +48,8 @@ dependencies:
   sign_in_with_apple: ^2.5.2
   sliding_up_panel: ^1.0.2
   table_calendar: ^2.2.3
+
+dependency_overrides: 
 
 dev_dependencies:
   flutter_test:
